@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Scripts Runner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Trading Scripts Runner</h1>
+            <p class="subtitle">Run trading signal scripts on-demand</p>
+        </header>
+
+        <div class="email-section">
+            <label for="userEmail">Enter your email to receive results:</label>
+            <input
+                type="email"
+                id="userEmail"
+                placeholder="your.email@example.com"
+                required
+            />
+            <small class="helper-text">The CSV output will be sent to this email when the script completes</small>
+        </div>
+
+        <div class="scripts-section">
+            <h2>Available Scripts</h2>
+            <p class="info-text">Click any button to run the corresponding script. Estimated completion time shown below each script.</p>
+
+            <div class="scripts-grid">
+                <!-- India Daily -->
+                <div class="script-card">
+                    <h3>India Daily Equity</h3>
+                    <p class="description">Daily Indian equity signals (Mon-Thu)</p>
+                    <p class="time">⏱ Estimated: 45-60 min</p>
+                    <button class="run-btn" data-script="india_daily">
+                        Run Script
+                    </button>
+                </div>
+
+                <!-- US Rolling Weekly -->
+                <div class="script-card">
+                    <h3>US Rolling Weekly</h3>
+                    <p class="description">Weekly US equity signals (Mon-Thu)</p>
+                    <p class="time">⏱ Estimated: 60-90 min</p>
+                    <button class="run-btn" data-script="us_rolling_weekly">
+                        Run Script
+                    </button>
+                </div>
+
+                <!-- India Weekly F&O -->
+                <div class="script-card">
+                    <h3>India Weekly F&O</h3>
+                    <p class="description">Weekly Indian F&O signals (Friday)</p>
+                    <p class="time">⏱ Estimated: 45-60 min</p>
+                    <button class="run-btn" data-script="india_weekly_fno">
+                        Run Script
+                    </button>
+                </div>
+
+                <!-- India Weekly NSE500 -->
+                <div class="script-card">
+                    <h3>India Weekly NSE500</h3>
+                    <p class="description">Weekly NSE500 signals (Friday)</p>
+                    <p class="time">⏱ Estimated: 45-60 min</p>
+                    <button class="run-btn" data-script="india_weekly_nse500">
+                        Run Script
+                    </button>
+                </div>
+
+                <!-- US Pairs 15-Min -->
+                <div class="script-card">
+                    <h3>US Pairs 15-Min</h3>
+                    <p class="description">15-minute pair trading signals</p>
+                    <p class="time">⏱ Estimated: 30-45 min</p>
+                    <button class="run-btn" data-script="us_pairs_15">
+                        Run Script
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-section" id="statusSection" style="display: none;">
+            <h3>Status</h3>
+            <div id="statusMessage"></div>
+        </div>
+
+        <footer>
+            <p>Note: Scripts run on AWS spot instances and auto-terminate when complete</p>
+        </footer>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal" id="loadingModal">
+        <div class="modal-content">
+            <div class="loader"></div>
+            <p id="loadingText">Launching script...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
