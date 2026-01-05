@@ -3,18 +3,22 @@ Flask API for Trading Scripts Web App
 Provides endpoints to run trading scripts on AWS spot instances
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from aws_runner import SpotInstanceRunner
 import os
 import re
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend
+
+# Path to frontend directory
+FRONTEND_DIR = Path(__file__).parent.parent / 'frontend'
 
 # Initialize AWS runner
 runner = SpotInstanceRunner()
@@ -53,6 +57,11 @@ def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
+@app.route('/')
+def index():
+    """Serve the frontend index.html"""
+    return send_from_directory(FRONTEND_DIR, 'index.html')
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -78,14 +87,20 @@ def run_script():
         "user_email": "user@example.com"
     }
     """
+    import sys
+    print("=" * 60, file=sys.stderr)
+    print("API /run endpoint called", file=sys.stderr)
     data = request.get_json()
+    print(f"Received data: {data}", file=sys.stderr)
 
     # Validate input
     if not data:
+        print("ERROR: No data provided", file=sys.stderr)
         return jsonify({'error': 'No data provided'}), 400
 
     script_name = data.get('script_name')
     user_email = data.get('user_email')
+    print(f"script_name: {script_name}, user_email: {user_email}", file=sys.stderr)
 
     if not script_name:
         return jsonify({'error': 'script_name is required'}), 400
@@ -105,9 +120,9 @@ def run_script():
 
     # Launch spot instance
     try:
-        print(f"Launching spot instance for {script_name} with email {user_email}")
+        print(f"Launching spot instance for {script_name} with email {user_email}", file=sys.stderr)
         result = runner.launch_spot_instance(script_name, user_email)
-        print(f"Launch result: {result}")
+        print(f"Launch result: {result}", file=sys.stderr)
 
         if result['success']:
             return jsonify({
@@ -121,16 +136,16 @@ def run_script():
                 'note': 'You will receive an email when the script completes'
             }), 200
         else:
-            print(f"Launch failed: {result.get('error')}")
+            print(f"Launch failed: {result.get('error')}", file=sys.stderr)
             return jsonify({
                 'success': False,
                 'error': result.get('error', 'Unknown error occurred')
             }), 500
 
     except Exception as e:
-        print(f"Exception launching script: {str(e)}")
+        print(f"Exception launching script: {str(e)}", file=sys.stderr)
         import traceback
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stderr)
         return jsonify({
             'success': False,
             'error': f'Failed to launch script: {str(e)}'
@@ -144,6 +159,16 @@ def get_status(instance_id):
         return jsonify(status)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/styles.css')
+def serve_css():
+    """Serve CSS file"""
+    return send_from_directory(FRONTEND_DIR, 'styles.css')
+
+@app.route('/script.js')
+def serve_js():
+    """Serve JavaScript file"""
+    return send_from_directory(FRONTEND_DIR, 'script.js')
 
 @app.errorhandler(404)
 def not_found(error):

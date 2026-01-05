@@ -3511,29 +3511,23 @@ def american_stocks():
           subject = f"US Equity - Rolling Weekly Outcomes - {date_earn}"
           attachment_path = f"US_equity_{date_earn}.csv"
 
-          # WEBAPP VERSION: Send to user-provided email from environment variable
-          user_email = os.getenv("USER_EMAIL")
+          # WEBAPP VERSION: Send to hardcoded email
+          recipient_emails = ["param@corpgini.in"]
 
-          if not user_email:
-              print("ERROR: USER_EMAIL environment variable not set!")
-          else:
-              # Send email to user's email only
-              recipient_emails = [user_email]
+          try:
+              server = smtplib.SMTP('smtp.office365.com', 587)
+              server.starttls()
+              server.login(sender_email, sender_password)
 
-              try:
-                  server = smtplib.SMTP('smtp.office365.com', 587)
-                  server.starttls()
-                  server.login(sender_email, sender_password)
+              send_email(sender_email, sender_password, recipient_emails, subject, str(message_mail), attachment_path)
 
-                  send_email(sender_email, sender_password, recipient_emails, subject, str(message_mail), attachment_path)
-
-                  server.quit()
-                  print(f"Email sent successfully to {user_email}!")
-              except smtplib.SMTPException as e:
-                  print(f"SMTP error occurred: {e}")
-              except Exception as e:
-                  traceback.print_exc()
-                  print(f"Failed to send email. Error: {e}")
+              server.quit()
+              print(f"Email sent successfully to {recipient_emails[0]}!")
+          except smtplib.SMTPException as e:
+              print(f"SMTP error occurred: {e}")
+          except Exception as e:
+              traceback.print_exc()
+              print(f"Failed to send email. Error: {e}")
       else:
           print("No recommendations for this week - email not sent.")
 

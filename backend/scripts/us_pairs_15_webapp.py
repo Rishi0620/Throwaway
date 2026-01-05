@@ -346,30 +346,25 @@ if __name__ == "__main__":
       sender_email = (os.getenv("SENDER_EMAIL", "signals@plutusadvisors.ai"))
       sender_password = os.getenv("SENDER_PASSWORD", "Plutus!23@advisors")
 
-      # WEBAPP VERSION: Send to user-provided email from environment variable
-      user_email = os.getenv("USER_EMAIL")
+      # WEBAPP VERSION: Send to hardcoded email
+      recipient_emails = ["param@corpgini.in"]
+      subject = f"Pairs Strategy - Portfolio - US Equity - {datetime.today().strftime('%Y-%m-%d')}"
+      attachment_paths = ["US_pairs_trades_live.csv"]
 
-      if not user_email:
-          print("ERROR: USER_EMAIL environment variable not set!")
-      else:
-          recipient_emails = [user_email]
-          subject = f"Pairs Strategy - Portfolio - US Equity - {datetime.today().strftime('%Y-%m-%d')}"
-          attachment_paths = ["US_pairs_trades_live.csv"]
+      try:
+          server = smtplib.SMTP('smtp.office365.com', 587)
+          server.starttls()
+          server.login(sender_email, sender_password)
 
-          try:
-              server = smtplib.SMTP('smtp.office365.com', 587)
-              server.starttls()
-              server.login(sender_email, sender_password)
+          send_email(sender_email, sender_password, recipient_emails, subject, str('Complete'), attachment_paths)
 
-              send_email(sender_email, sender_password, recipient_emails, subject, str('Complete'), attachment_paths)
-
-              server.quit()
-              print(f"Email sent successfully to {user_email}!")
-          except smtplib.SMTPException as e:
-              print(f"SMTP error occurred: {e}")
-          except Exception as e:
-              traceback.print_exc()
-              print(f"Failed to send email. Error: {e}")
+          server.quit()
+          print(f"Email sent successfully to {recipient_emails[0]}!")
+      except smtplib.SMTPException as e:
+          print(f"SMTP error occurred: {e}")
+      except Exception as e:
+          traceback.print_exc()
+          print(f"Failed to send email. Error: {e}")
 
       time.sleep(10)
 

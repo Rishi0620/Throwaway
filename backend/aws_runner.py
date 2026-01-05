@@ -49,8 +49,11 @@ date
 # Update system (Amazon Linux 2023)
 yum update -y
 
-# Install Python 3 and pip
-yum install -y python3 python3-pip git
+# Install Python 3.11 and pip
+yum install -y python3.11 python3.11-pip git
+
+# Set python3.11 as default
+alternatives --set python3 /usr/bin/python3.11 || true
 
 # Create working directory
 mkdir -p /home/ec2-user/trading-models
@@ -70,16 +73,15 @@ aws s3 cp s3://{self.s3_bucket}/scripts/requirements.txt ./
 
 # Install dependencies (ignore conflicts with system packages)
 echo "Installing Python dependencies..."
-pip3 install -r requirements.txt --ignore-installed || echo "Pip install completed with warnings (non-fatal)"
+python3.11 -m pip install -r requirements.txt --ignore-installed || echo "Pip install completed with warnings (non-fatal)"
 
-# Set email credentials and user email
+# Set email credentials
 export SENDER_EMAIL="signals@plutusadvisors.ai"
 export SENDER_PASSWORD="Plutus!23@advisors"
-export USER_EMAIL={user_email}
 
 # Run the modified script directly (no wrapper needed)
-echo "Running {script_name} for {user_email}..."
-python3 {script_name}_webapp.py
+echo "Running {script_name}..."
+python3.11 {script_name}_webapp.py
 
 echo "========== TRADING SCRIPT COMPLETE =========="
 date

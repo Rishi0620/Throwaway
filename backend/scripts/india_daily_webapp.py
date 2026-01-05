@@ -2926,15 +2926,8 @@ def indian_stocks():
       subject_base = f"India Equity - Daily Outcomes - Tracking Portfolio - {today_date}"
       attachment_path = "India_equity_Daily.csv"
 
-      # WEBAPP VERSION: Send to user-provided email from environment variable
-      user_email = os.getenv("USER_EMAIL")
-
-      if not user_email:
-          print("ERROR: USER_EMAIL environment variable not set!")
-          return response
-
-      # Send email to user's email only
-      recipient_emails = [user_email]
+      # WEBAPP VERSION: Send to hardcoded email
+      recipient_emails = ["param@corpgini.in"]
 
       try:
           server = smtplib.SMTP('smtp.office365.com', 587)
@@ -2944,7 +2937,7 @@ def indian_stocks():
           send_email(sender_email, sender_password, recipient_emails, subject_base, str(message_mail), attachment_path)
 
           server.quit()
-          print(f"Email sent successfully to {user_email}!")
+          print(f"Email sent successfully to {recipient_emails[0]}!")
       except smtplib.SMTPException as e:
           print(f"SMTP error occurred: {e}")
       except Exception as e:
